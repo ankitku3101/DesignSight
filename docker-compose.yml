@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # MongoDB service
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  # Backend service
+  backend:
+    build:
+      context: ./apps/backend
+    container_name: backend
+    ports:
+      - "5000:5000"
+    environment:
+      # This is how the backend connects to the database. The hostname is the
+      # service name defined in this file.
+      - MONGODB_URI=mongodb://mongodb:27017/designsight_db
+    depends_on:
+      - mongodb
+    volumes:
+      - ./apps/backend:/usr/src/app
+      - /usr/src/app/node_modules
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./apps/frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./apps/frontend:/usr/src/app
+
+volumes:
+  mongodb_data:
