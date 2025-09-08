@@ -1,135 +1,122 @@
-# Turborepo starter
+# DesignSight
 
-This Turborepo starter is maintained by the Turborepo core team.
+A full‑stack app for collecting automated and AI‑assisted feedback on design screenshots, organized by projects and screens. Backed by Node.js/Express + MongoDB, with a modern Next.js frontend styled with Tailwind.
 
-## Using this example
+## Architecture
 
-Run the following command:
+- Backend: Express (TypeScript), MongoDB (Mongoose), Multer for uploads
+- AI:
+  - Google Cloud Vision: extracts regions/objects/text + coordinates
+  - Gemini (Google Generative AI): generates structured UX/UI suggestions
+- Frontend: Next.js App Router, Tailwind, role‑based filtering in UI
 
-```sh
-npx create-turbo@latest
-```
+## Prerequisites
 
-## What's inside?
+- Node.js 18+ and npm
+- MongoDB (local or cloud) or Docker if using docker-compose
+- Google Cloud project with Vision API enabled
+- Gemini API key via Google AI Studio (or Vertex AI)
 
-This Turborepo includes the following packages/apps:
+## Environment variables
 
-### Apps and Packages
+Create a .env file for the backend (`apps/backend/.env`) and frontend (`apps/frontend/.env.local`).
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+Backend (`apps/backend/.env`):
+- MONGO_URI: MongoDB connection string (e.g., mongodb://localhost:27017/designsight)
+- PORT: Backend port (default 5000)
+- BE_URL: Public/base URL of the backend used to build file URLs (e.g., http://localhost:5000)
+- GEMINI_API_KEY: API key from Google AI Studio for Gemini
+- GOOGLE_APPLICATION_CREDENTIALS: Absolute path to the Vision service account JSON (optional if using explicit keyFilename in code)
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+Frontend (`apps/frontend/.env.local`):
+- NEXT_PUBLIC_BE_URL: Base URL of the backend (e.g., http://localhost:5000)
 
-### Utilities
+Service account JSON for Vision:
+- Place your Google Cloud Vision service account key JSON at `apps/backend/secrets/google-api.json`
+- Ensure the service account has Vision permissions; keep this file secret
 
-This Turborepo has some additional tools already setup for you:
+## Provider setup and costs
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- Google Cloud Vision
+  - Enable Vision API in your Google Cloud project
+  - Create a service account and download the JSON key
+  - Pricing: Vision is billed per feature usage (e.g., object/label/text detection). New Google Cloud users often get free credits (~$300) that can offset usage while evaluating. See Google Cloud Vision pricing for current rates and free credit eligibility.
+- Gemini (Google AI Studio)
+  - Get an API key at Google AI Studio
+  - Free tier typically available with rate limits; paid usage (or Vertex AI) is billed by tokens. Check current pricing docs for exact numbers.
 
-### Build
+Estimated cost (example scenario):
+- Light evaluation (e.g., 100 screen analyses/month using basic Vision + a few Gemini prompts) often fits within free credits or low single‑digit USD. Exact costs depend on features called per image and Gemini prompt sizes. Always review current pricing pages before production.
 
-To build all apps and packages, run the following command:
+## Running locally
 
-```
-cd my-turborepo
+- Install dependencies (from repo root):
+  - npm install
+- Backend:
+  - cd apps/backend
+  - npm run dev
+  - The server starts on PORT (default 5000)
+- Frontend:
+  - cd apps/frontend
+  - npm run dev
+  - App runs on Next.js dev server (default 3000)
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+Ensure `NEXT_PUBLIC_BE_URL` points to the backend (http://localhost:5000 in local dev).
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+## Running with Docker
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+- docker-compose up -d
+- Access frontend at http://localhost:3000 and backend at http://localhost:5000
+- Make sure your Vision service account JSON is mounted or present at `apps/backend/secrets/google-api.json` inside the container per your compose/Dockerfile setup
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## File uploads
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+- Images are stored on the backend filesystem in `apps/backend/dist/uploads` at runtime and served via `/uploads/*`
+- The API builds absolute URLs using `BE_URL`
 
-### Develop
+## API overview
 
-To develop all apps and packages, run the following command:
+- POST /api/projects: create a project
+- GET /api/projects: list projects
+- POST /api/projects/:id/screens: upload image (multipart/form-data, field name: image); runs Vision then Gemini
+- GET /api/projects/:id/screens: list screens for a project
+- GET /api/projects/:id/screens/:screenId: fetch a screen with feedback + suggestions
+- GET /api/screens/:screenId/export: export structured data (JSON)
 
-```
-cd my-turborepo
+## Design note (tradeoffs)
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+We kept provider prompts and Vision usage straightforward to maintain determinism in shape (type/message/coordinates) while allowing semantic variability in wording. Coordinates from Vision are favored when available and passed through to the UI for contextualization. The system uses simple local disk storage for uploads to keep infra minimal; this can be swapped for cloud storage later. We avoided extra UI libraries to keep the footprint small and retain control over styling with Tailwind.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+## End‑to‑end process flow
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+1. Upload a screen image in the project’s Screens page (frontend → backend `/api/projects/:id/screens`).
+2. Backend stores the image, runs Google Vision (objects/labels/text) and generates region‑aware feedback.
+3. Backend calls Gemini with the Vision context + image to produce structured UI/UX suggestions.
+4. Backend saves a `Screen` document with `imageUrl`, `feedbackItems` (Vision), and `geminiSuggestions`.
+5. Frontend screen detail fetches the `Screen`, applies role‑based filtering, and renders:
+   - Image card
+   - Regions Referenced (x/y/w/h from either source when present)
+   - Vision Feedback cards
+   - AI Suggestions cards
+6. Export endpoint returns a JSON bundle with image reference and all feedback for review/share.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+## Turborepo / Monorepo structure
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+- `apps/backend`: Express API in TypeScript
+  - `src/index.ts`: app bootstrap and routes wiring
+  - `src/routes/`: `projectRoutes.ts`, `screenRoutes.ts`
+  - `src/models/`: `Project.ts`, `Screen.ts`
+  - `src/services/`: `googleVision.ts`, `gemini.ts`
+  - `secrets/`: place Vision service account JSON here
+  - `dist/`: compiled output and runtime `uploads/`
+- `apps/frontend`: Next.js (App Router)
+  - `app/`: pages and routes (projects, screens, detail)
+  - `components/`: UI components (cards, uploader, role switcher, comments, export)
+  - `public/`, Tailwind config and globals
+- `packages/`: shared configs
+  - `eslint-config/`, `typescript-config/`, `ui/`
+- Root: `turbo.json` and workspace scripts (`dev`, `build`, `lint`)
 
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+Notes:
+- Use `npm run dev` at the root to run both apps via Turborepo (or run each app separately).
+- Frontend expects `NEXT_PUBLIC_BE_URL` to reach backend; CORS is enabled by default on the API.
