@@ -17,15 +17,15 @@ services:
     container_name: backend
     ports:
       - "5000:5000"
-    environment:
-      # This is how the backend connects to the database. The hostname is the
-      # service name defined in this file.
-      - MONGODB_URI=mongodb://mongodb:27017/designsight_db
+    env_file:
+      - .env
     depends_on:
       - mongodb
     volumes:
-      - ./apps/backend:/usr/src/app
-      - /usr/src/app/node_modules
+    - ./apps/backend/secrets/google-api.json:/usr/src/app/secrets/google-api.json:ro
+    environment:
+    - GOOGLE_APPLICATION_CREDENTIALS=/usr/src/app/secrets/google-api.json
+
 
   # Frontend service
   frontend:
