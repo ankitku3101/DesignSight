@@ -35,19 +35,25 @@ export default function ScreensPage({ params }: PageProps) {
   }, [id]);
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">DesignSight – Screens</h1>
-      <ImageUploader projectId={id} onUploaded={fetchScreens} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 mt-6">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold tracking-tight">Screens</h1>
+      </div>
+      <div className="rounded-xl border border-border bg-card p-4">
+        <ImageUploader projectId={id} onUploaded={fetchScreens} />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
         {screens.map((screen) => (
-          <div key={screen._id} className="shadow rounded border p-2">
-            <img src={screen.imageUrl} alt="" className="w-full aspect-video object-cover rounded border" />
-            <Link href={`/projects/${id}/screens/${screen._id}`}>
-              <button className="w-full mt-2 bg-blue-600 text-white rounded py-1">View Feedback</button>
-            </Link>
+          <div key={screen._id} className="group rounded-xl border border-border overflow-hidden bg-card hover:shadow-sm transition">
+            <img src={screen.imageUrl} alt="" className="w-full aspect-video object-cover" />
+            <div className="p-3">
+              <Link href={`/projects/${id}/screens/${screen._id}`} className="inline-flex w-full items-center justify-center rounded-md bg-foreground text-background px-3 py-2 text-sm font-medium hover:opacity-90 transition">
+                View Feedback
+              </Link>
+            </div>
           </div>
         ))}
-        {fetching && <div>Loading…</div>}
+        {fetching && <div className="text-sm text-muted-foreground">Loading…</div>}
       </div>
     </div>
   );

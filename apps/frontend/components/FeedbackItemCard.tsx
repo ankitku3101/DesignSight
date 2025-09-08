@@ -11,15 +11,20 @@ type Props = {
     comments?: CommentType[];
   };
   screenId: string;
+  onHoverRegion?: (coords: { x: number; y: number; w: number; h: number } | null) => void;
 };
-export default function FeedbackItemCard({ item, screenId }: Props) {
+export default function FeedbackItemCard({ item, screenId, onHoverRegion }: Props) {
   // handleReply would POST to `/api/screens/:screenId/feedback/:feedbackId/comments`
   const handleReply = async (parentId: string, message: string) => {
     // Add POST logic here
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg mb-4 p-4 bg-white shadow-sm">
+    <div
+      className="border border-gray-200 rounded-lg mb-4 p-4 bg-white shadow-sm hover:border-foreground/30 transition"
+      onMouseEnter={() => onHoverRegion?.(item.coordinates || null)}
+      onMouseLeave={() => onHoverRegion?.(null)}
+    >
       <div className="flex items-start gap-2">
         <span
           className={

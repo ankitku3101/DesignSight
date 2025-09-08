@@ -24,10 +24,35 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <header className="sticky top-0 z-40 border-b border-border/80 bg-background/70 backdrop-blur">
+            <div className="mx-auto w-full max-w-6xl px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded-md bg-foreground"></div>
+                <span className="font-semibold tracking-tight">DesignSight</span>
+              </div>
+              <nav className="flex items-center gap-4 text-sm text-muted-foreground">
+                <a href="/" className="hover:text-foreground transition-colors">Dashboard</a>
+              </nav>
+            </div>
+          </header>
+
+          {/* Main */}
+          <main className="flex-1">
+            <div className="mx-auto w-full max-w-6xl px-4 py-8">
+              {children}
+            </div>
+          </main>
+
+          {/* Footer */}
+          <footer className="border-t border-border/80">
+            <div className="mx-auto w-full max-w-6xl px-4 py-6 text-xs text-muted-foreground">
+              © {new Date().getFullYear()} DesignSight
+            </div>
+          </footer>
+        </div>
       </body>
     </html>
   );

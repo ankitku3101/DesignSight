@@ -61,51 +61,50 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-3xl">
-      <h1 className="text-3xl font-bold mb-8 text-gray-800">Project Dashboard</h1>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Project Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">Create and manage your design review projects.</p>
+      </div>
 
-      <div className="mb-8 bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">Create New Project</h2>
-        <div className="flex items-center gap-4">
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h2 className="text-lg font-medium">Create New Project</h2>
+        <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <input
             type="text"
             placeholder="Enter project name"
             value={newProjectName}
             onChange={e => setNewProjectName(e.target.value)}
-            className="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:bg-gray-100"
+            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/60"
             disabled={loading}
           />
           <button
             onClick={createProject}
             disabled={loading}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition disabled:bg-blue-300"
+            className="inline-flex items-center justify-center rounded-md bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
           >
-            {loading ? 'Creating...' : 'Create Project'}
+            {loading ? 'Creating…' : 'Create Project'}
           </button>
         </div>
-        {error && (
-          <p className="text-red-500 mt-3 text-sm animate-fade-in">{error}</p>
-        )}
+        {error && <p className="text-red-500 mt-3 text-sm">{error}</p>}
       </div>
 
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">Your Projects</h2>
-        {loading && <p className="text-gray-500 italic">Loading projects...</p>}
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <h2 className="text-lg font-medium">Your Projects</h2>
+        {loading && <p className="text-muted-foreground mt-2 text-sm">Loading projects…</p>}
         {!loading && projects.length === 0 && (
-          <p className="text-gray-500">No projects found. Create one above.</p>
+          <p className="text-muted-foreground mt-2 text-sm">No projects found. Create one above.</p>
         )}
         {!loading && projects.length > 0 && (
-          <ul className="grid gap-3">
+          <ul className="mt-4 grid gap-3">
             {projects.map(proj => (
-              <li
-                key={proj._id}
-                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition"
-              >
+              <li key={proj._id} className="group rounded-lg border border-border p-4 hover:bg-muted/40 transition">
                 <button
                   onClick={() => router.push(`/projects/${proj._id}/screens`)}
-                  className="w-full text-left text-blue-600 font-medium hover:text-blue-800 transition"
+                  className="w-full text-left flex items-center justify-between"
                 >
-                  {proj.name}
+                  <span className="font-medium group-hover:opacity-90">{proj.name}</span>
+                  <span className="text-xs text-muted-foreground">Open →</span>
                 </button>
               </li>
             ))}

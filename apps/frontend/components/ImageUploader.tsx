@@ -35,9 +35,21 @@ export default function ImageUploader({ projectId, onUploaded }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 mt-2 sm:flex-row sm:items-center">
-      <input type="file" accept="image/png,image/jpeg" onChange={e => setFile(e.target.files?.[0] ?? null)} disabled={loading} />
-      <button type="submit" disabled={loading || !file} className="bg-green-600 text-white px-3 py-1 rounded">Upload & Analyze</button>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <input
+        type="file"
+        accept="image/png,image/jpeg"
+        onChange={e => setFile(e.target.files?.[0] ?? null)}
+        disabled={loading}
+        className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-foreground file:px-3 file:py-2 file:text-background hover:file:opacity-90 file:transition"
+      />
+      <button
+        type="submit"
+        disabled={loading || !file}
+        className="inline-flex items-center justify-center rounded-md bg-foreground text-background px-4 py-2 text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
+      >
+        {loading ? 'Uploading…' : 'Upload & Analyze'}
+      </button>
       {error && <span className="text-red-500 text-sm">{error}</span>}
     </form>
   );

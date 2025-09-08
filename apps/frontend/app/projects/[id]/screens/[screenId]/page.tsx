@@ -78,51 +78,90 @@ export default function ScreenDetailPage({ params }: PageProps) {
     ) || [];
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="font-bold text-xl mb-1">Screen Feedback</h2>
-      <RoleSwitcher value={role} onChange={(r: string) => setRole(r as Role)} />
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight">Screen Feedback</h2>
+          <p className="text-sm text-muted-foreground">Review automated insights and AI suggestions.</p>
+        </div>
+        <RoleSwitcher value={role} onChange={(r: string) => setRole(r as Role)} />
+      </div>
 
-      <div className="flex flex-col md:flex-row gap-6 mt-5">
-        {/* LEFT: Image & Export */}
-        <div className="flex-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Card 1: Image */}
+        <div className="rounded-xl border border-border bg-card p-3 shadow-sm">
           <img
             src={screen.imageUrl}
             alt="Screen"
-            className="rounded border mb-3 max-w-full shadow"
+            className="rounded-lg border border-border/70 w-full max-w-full shadow-sm"
           />
-          <ExportButton screenId={screen._id} />
+          <div className="flex items-center justify-end">
+            <ExportButton screenId={screen._id} />
+          </div>
         </div>
 
-        {/* RIGHT: Feedback */}
-        <div className="flex-1 space-y-6">
-          {/* Vision Feedback */}
-          <div>
-            <h3 className="font-semibold text-lg mb-2 text-gray-800">Vision Feedback</h3>
-            {visionFiltered.length === 0 ? (
-              <div className="text-gray-500">No Vision feedback for this role.</div>
-            ) : (
-              visionFiltered.map((item, idx) => (
-                <FeedbackItemCard
-                  key={item._id || `vision-${idx}`}
-                  item={item as Required<FeedbackItem>}
-                  screenId={screen._id}
-                />
-              ))
-            )}
-          </div>
+        {/* Card 2: Coordinates list */}
+        <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+          <h3 className="font-semibold text-lg mb-3">Regions Referenced</h3>
+          {(() => {
+            const itemsWithCoords = [
+              ...(visionFiltered || []),
+              ...(geminiFiltered || []),
+            ].filter((i) => i.coordinates);
+            if (itemsWithCoords.length === 0) {
+              return <div className="text-sm text-muted-foreground">No regions specified.</div>;
+            }
+            return (
+              <ul className="space-y-2 text-sm">
+                {itemsWithCoords.map((i, idx) => (
+                  <li key={i._id || `coords-${idx}`} className="rounded border border-border/70 p-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium capitalize">{i.type}</span>
+                      <span className="text-xs text-muted-foreground">{i._id?.slice(-6) || `#${idx + 1}`}</span>
+                    </div>
+                    <div className="mt-1 grid grid-cols-4 gap-2">
+                      <span><span className="text-muted-foreground">x:</span> {i.coordinates!.x}</span>
+                      <span><span className="text-muted-foreground">y:</span> {i.coordinates!.y}</span>
+                      <span><span className="text-muted-foreground">w:</span> {i.coordinates!.w}</span>
+                      <span><span className="text-muted-foreground">h:</span> {i.coordinates!.h}</span>
+                    </div>
+                    <p className="mt-1 text-muted-foreground line-clamp-2">{i.message}</p>
+                  </li>
+                ))}
+              </ul>
+            );
+          })()}
+        </div>
 
-          {/* Gemini Suggestions */}
-          {geminiFiltered.length > 0 && (
-            <div className="p-5 border rounded-lg bg-gray-50 shadow-sm">
-              <h3 className="font-semibold text-lg mb-3 text-gray-800">AI Suggestions</h3>
-              {geminiFiltered.map((item, idx) => (
-                <FeedbackItemCard
-                  key={item._id || `gemini-${idx}`}
-                  item={item as Required<FeedbackItem>}
-                  screenId={screen._id}
-                />
-              ))}
-            </div>
+        {/* Card 3: Vision Feedback */}
+        <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+          <h3 className="font-semibold text-lg mb-3">Vision Feedback</h3>
+          {visionFiltered.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No Vision feedback for this role.</div>
+          ) : (
+            visionFiltered.map((item, idx) => (
+              <FeedbackItemCard
+                key={item._id || `vision-${idx}`}
+                item={item as Required<FeedbackItem>}
+                screenId={screen._id}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Card 4: AI Suggestions */}
+        <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+          <h3 className="font-semibold text-lg mb-3">AI Suggestions</h3>
+          {geminiFiltered.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No AI suggestions for this role.</div>
+          ) : (
+            geminiFiltered.map((item, idx) => (
+              <FeedbackItemCard
+                key={item._id || `gemini-${idx}`}
+                item={item as Required<FeedbackItem>}
+                screenId={screen._id}
+              />
+            ))
           )}
         </div>
       </div>

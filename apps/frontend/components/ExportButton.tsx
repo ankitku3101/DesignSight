@@ -16,6 +16,8 @@ export default function ExportButton({ screenId }: Props) {
     URL.revokeObjectURL(url);
   }
   return (
-    <button onClick={exportJson} className="mt-3 bg-gray-800 px-3 py-2 text-white rounded">Export Feedback (JSON)</button>
+    <button onClick={exportJson} className="mt-3 inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-muted/60 transition">
+      Export Feedback (JSON)
+    </button>
   );
 }
