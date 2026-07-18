@@ -5,10 +5,7 @@ import { uploadScreenImage } from './storage/cloudinary.service';
 import { analyzeScreen } from './ai/analyzeScreen';
 import { AppError } from '../middleware/errorHandler.middleware';
 
-export async function uploadAndAnalyzeScreen(
-  projectName: string | undefined,
-  file: Express.Multer.File,
-) {
+export async function uploadScreen(projectName: string | undefined, file: Express.Multer.File) {
   const project = await findOrCreateProject(projectName);
   const image = await uploadScreenImage(file.buffer);
 
@@ -16,13 +13,35 @@ export async function uploadAndAnalyzeScreen(
     projectId: project._id,
     imageUrl: image.secureUrl,
     imagePublicId: image.publicId,
+    imageMimeType: file.mimetype,
     imageWidth: image.width,
     imageHeight: image.height,
-    status: 'processing',
+    status: 'uploaded',
   });
 
+  return { screen, project };
+}
+
+export async function analyzeScreenById(screenId: string) {
+  const screen = await Screen.findById(screenId);
+  if (!screen) throw new AppError(404, 'Screen not found');
+
+  screen.status = 'processing';
+  screen.error = null;
+  await screen.save();
+
+  // Re-analyzing (a retry after failure, or re-running an already-analyzed screen)
+  // replaces the feedback set rather than appending a second copy alongside it.
+  await Feedback.deleteMany({ screenId: screen._id });
+
   try {
-    const items = await analyzeScreen(file.buffer, file.mimetype);
+    // The upload request's in-memory buffer is long gone by the time analysis is
+    // triggered as a separate action, so the image is re-fetched from Cloudinary.
+    const response = await fetch(screen.imageUrl);
+    if (!response.ok) throw new Error(`Failed to fetch stored image: ${response.statusText}`);
+    const buffer = Buffer.from(await response.arrayBuffer());
+
+    const items = await analyzeScreen(buffer, screen.imageMimeType);
     // createdAt is populated by the schema default; insertMany's input typing doesn't
     // account for schema defaults, so the cast just tells TS what Mongoose does at runtime.
     const feedback = await Feedback.insertMany(
@@ -30,14 +49,14 @@ export async function uploadAndAnalyzeScreen(
     );
     screen.status = 'analyzed';
     await screen.save();
-    return { screen, feedback, project };
+    return { screen, feedback };
   } catch (error) {
     // Never silently swallow a failed analysis — surface it on the Screen so the
     // frontend can show a real failed state instead of an empty feedback list.
     screen.status = 'failed';
     screen.error = error instanceof Error ? error.message : 'AI analysis failed';
     await screen.save();
-    return { screen, feedback: [], project };
+    return { screen, feedback: [] };
   }
 }
 

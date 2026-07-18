@@ -7,8 +7,14 @@ import * as screenService from '../services/screen.service';
 export async function uploadScreen(req: Request, res: Response) {
   if (!req.file) throw new AppError(400, 'An image file is required');
   const { projectName } = uploadScreenSchema.parse(req.body);
-  const result = await screenService.uploadAndAnalyzeScreen(projectName, req.file);
+  const result = await screenService.uploadScreen(projectName, req.file);
   res.status(201).json(result);
+}
+
+export async function analyzeScreen(req: Request, res: Response) {
+  const screenId = objectIdSchema.parse(req.params.screenId);
+  const result = await screenService.analyzeScreenById(screenId);
+  res.json(result);
 }
 
 export async function listRecentScreens(_req: Request, res: Response) {

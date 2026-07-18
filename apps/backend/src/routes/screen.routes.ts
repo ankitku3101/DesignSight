@@ -4,9 +4,10 @@ import * as screenController from '../controllers/screen.controller';
 
 const router = Router();
 
-// Uploading a screen is the only "create" action in the whole app — the project it
-// belongs to is resolved (or auto-created) inline, no separate project-creation step.
+// Upload and analyze are deliberately separate actions: analysis costs a real Gemini
+// call, so it only ever fires on an explicit second action, never automatically on upload.
 router.post('/screens', upload.single('image'), screenController.uploadScreen);
+router.post('/screens/:screenId/analyze', screenController.analyzeScreen);
 router.get('/screens', screenController.listRecentScreens);
 router.get('/screens/:screenId', screenController.getScreen);
 

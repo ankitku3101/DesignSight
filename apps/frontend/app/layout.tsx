@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -37,7 +38,7 @@ export default function RootLayout({
                   <span className="font-semibold tracking-tight">DesignSight</span>
                 </div>
                 <nav className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <a href="/" className="hover:text-foreground transition-colors">Dashboard</a>
+                  <Link href="/" className="hover:text-foreground transition-colors">Dashboard</Link>
                 </nav>
               </div>
             </header>
