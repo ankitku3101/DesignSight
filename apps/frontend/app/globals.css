@@ -3,10 +3,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Hallmark · genre: modern-minimal · macrostructure: Marquee Hero · theme: custom
+ * vibe: "precise, confident, AI design review" · anchor hue: 255° (indigo)
+ * nav: N9 · footer: Ft5 · enrichment: E-CSS art (sample report, Tier A)
+ * fonts: Bricolage Grotesque (display 700) + Plus Jakarta Sans (body 400)
+ * Pre-emit critique: P5 H5 E5 S5 R4 V5
+ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-jakarta);
+  --font-heading: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -41,75 +50,91 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Hallmark custom accent */
+  --color-indigo: var(--indigo);
+  --color-indigo-text: var(--indigo-text);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* ── Custom palette · vibe: precise / confident AI tool · anchor 255° ── */
+  --radius: 0.5rem;
+
+  --background:                 oklch(98.5% 0.003 240);
+  --foreground:                 oklch(13%   0.010 255);
+  --card:                       oklch(97.5% 0.004 242);
+  --card-foreground:            oklch(13%   0.010 255);
+  --popover:                    oklch(98%   0.003 240);
+  --popover-foreground:         oklch(13%   0.010 255);
+  --primary:                    oklch(13%   0.010 255);
+  --primary-foreground:         oklch(98%   0.003 240);
+  --secondary:                  oklch(93.5% 0.007 242);
+  --secondary-foreground:       oklch(13%   0.010 255);
+  --muted:                      oklch(93.5% 0.007 242);
+  --muted-foreground:           oklch(44%   0.007 248);
+  --accent:                     oklch(91%   0.008 242);
+  --accent-foreground:          oklch(13%   0.010 255);
+  --destructive:                oklch(55%   0.22  25);
+  --border:                     oklch(88%   0.006 242);
+  --input:                      oklch(88%   0.006 242);
+  --ring:                       oklch(50%   0.22  265);
+
+  --chart-1:                    oklch(50%   0.22  265);
+  --chart-2:                    oklch(60%   0.118 185);
+  --chart-3:                    oklch(40%   0.07  227);
+  --chart-4:                    oklch(65%   0.18  330);
+  --chart-5:                    oklch(70%   0.16  50);
+
+  --sidebar:                    oklch(96%   0.005 240);
+  --sidebar-foreground:         oklch(13%   0.010 255);
+  --sidebar-primary:            oklch(13%   0.010 255);
+  --sidebar-primary-foreground: oklch(98%   0.003 240);
+  --sidebar-accent:             oklch(91%   0.008 242);
+  --sidebar-accent-foreground:  oklch(13%   0.010 255);
+  --sidebar-border:             oklch(88%   0.006 242);
+  --sidebar-ring:               oklch(50%   0.22  265);
+
+  /* Indigo accent — use at ≤ 3 % of viewport */
+  --indigo:                     oklch(50%   0.22  265);
+  --indigo-text:                oklch(40%   0.20  265);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background:                 oklch(11%   0.012 255);
+  --foreground:                 oklch(95%   0.004 240);
+  --card:                       oklch(15%   0.012 252);
+  --card-foreground:            oklch(95%   0.004 240);
+  --popover:                    oklch(15%   0.012 252);
+  --popover-foreground:         oklch(95%   0.004 240);
+  --primary:                    oklch(93%   0.005 240);
+  --primary-foreground:         oklch(11%   0.012 255);
+  --secondary:                  oklch(20%   0.012 252);
+  --secondary-foreground:       oklch(93%   0.005 240);
+  --muted:                      oklch(20%   0.012 252);
+  --muted-foreground:           oklch(68%   0.005 245);
+  --accent:                     oklch(22%   0.012 252);
+  --accent-foreground:          oklch(93%   0.005 240);
+  --destructive:                oklch(68%   0.18  25);
+  --border:                     oklch(100%  0     0 / 12%);
+  --input:                      oklch(100%  0     0 / 15%);
+  --ring:                       oklch(72%   0.19  265);
+
+  --chart-1:                    oklch(72%   0.19  265);
+  --chart-2:                    oklch(70%   0.17  162);
+  --chart-3:                    oklch(77%   0.188 70);
+  --chart-4:                    oklch(63%   0.265 304);
+  --chart-5:                    oklch(65%   0.246 16);
+
+  --sidebar:                    oklch(15%   0.012 252);
+  --sidebar-foreground:         oklch(95%   0.004 240);
+  --sidebar-primary:            oklch(72%   0.19  265);
+  --sidebar-primary-foreground: oklch(11%   0.012 255);
+  --sidebar-accent:             oklch(22%   0.012 252);
+  --sidebar-accent-foreground:  oklch(93%   0.005 240);
+  --sidebar-border:             oklch(100%  0     0 / 12%);
+  --sidebar-ring:               oklch(72%   0.19  265);
+
+  --indigo:                     oklch(72%   0.19  265);
+  --indigo-text:                oklch(78%   0.17  265);
 }
 
 @layer base {
@@ -118,5 +143,42 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  html,
+  body {
+    overflow-x: clip;
+  }
+  /* All headings use Bricolage Grotesque — roman only, no italic */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-style: normal;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+}
+
+@layer utilities {
+  /* Hero display — Bricolage Grotesque 700, tight tracking */
+  .text-display {
+    font-family: var(--font-heading);
+    font-size: clamp(2.75rem, 5.5vw + 0.5rem, 5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    font-style: normal;
+  }
+  /* Section/footer display — Bricolage Grotesque 600 */
+  .text-section {
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2.25rem);
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+    font-style: normal;
   }
 }

@@ -1,0 +1,103 @@
+/*
+ * Hallmark · tokens.css
+ * theme: custom · anchor 255° (indigo) · genre: modern-minimal · macrostructure: Marquee Hero
+ * project: DesignSight · generated: 2026-07-19
+ *
+ * Import this file in any downstream project that wants to adopt
+ * this design system. All values reference OKLCH for perceptual uniformity.
+ */
+
+:root {
+  /* ── COLOUR — light mode ─────────────────────────────────────────── */
+
+  /* Surface stack */
+  --color-paper:         oklch(98.5% 0.003 240);   /* base background */
+  --color-paper-2:       oklch(97.5% 0.004 242);   /* section surfaces, cards */
+  --color-paper-3:       oklch(93.5% 0.007 242);   /* hover states */
+
+  /* Rules + structure */
+  --color-rule:          oklch(88%   0.006 242);   /* borders, dividers */
+
+  /* Text ramp */
+  --color-neutral:       oklch(44%   0.007 248);   /* secondary labels */
+  --color-muted:         oklch(44%   0.007 248);   /* placeholder, helper text */
+  --color-ink:           oklch(13%   0.010 255);   /* primary text */
+
+  /* Indigo accent — use at ≤3% of viewport */
+  --color-accent:        oklch(50%   0.22  265);   /* icons, focus rings, borders */
+  --color-accent-text:   oklch(40%   0.20  265);   /* accent on-paper text */
+  --color-accent-soft:   oklch(96%   0.012 255);   /* tinted bg for accent regions */
+
+  /* Semantic */
+  --color-focus:         oklch(50%   0.22  265);
+  --color-destructive:   oklch(55%   0.22  25);
+
+  /* ── COLOUR — dark mode overrides ───────────────────────────────── */
+  /* Apply these inside .dark {} in your consuming stylesheet           */
+
+  /* --color-paper:      oklch(11%   0.012 255); */
+  /* --color-paper-2:    oklch(15%   0.012 252); */
+  /* --color-paper-3:    oklch(20%   0.012 252); */
+  /* --color-rule:       oklch(100%  0     0 / 12%); */
+  /* --color-neutral:    oklch(68%   0.005 245); */
+  /* --color-ink:        oklch(95%   0.004 240); */
+  /* --color-accent:     oklch(72%   0.19  265); */
+  /* --color-accent-text:oklch(78%   0.17  265); */
+
+  /* ── FONT ───────────────────────────────────────────────────────── */
+
+  /* 2+1 rule: Bricolage Grotesque (display) + Plus Jakarta Sans (body) + Geist Mono (outlier ≤2 contexts) */
+  --font-display:  var(--font-bricolage);    /* headings, hero */
+  --font-body:     var(--font-jakarta);      /* running copy */
+  --font-mono:     var(--font-geist-mono);   /* wordmark + step indicators only */
+
+  /* ── SPACING — 4-pt scale ──────────────────────────────────────── */
+
+  --space-1:    0.25rem;   /*  4px */
+  --space-2:    0.5rem;    /*  8px */
+  --space-3:    0.75rem;   /* 12px */
+  --space-4:    1rem;      /* 16px */
+  --space-6:    1.5rem;    /* 24px */
+  --space-8:    2rem;      /* 32px */
+  --space-10:   2.5rem;    /* 40px */
+  --space-12:   3rem;      /* 48px */
+  --space-16:   4rem;      /* 64px */
+  --space-20:   5rem;      /* 80px */
+  --space-24:   6rem;      /* 96px */
+
+  /* ── TYPE SCALE — major third 1.25 ────────────────────────────── */
+
+  --text-xs:       0.64rem;
+  --text-sm:       0.8rem;
+  --text-base:     1rem;
+  --text-md:       1.25rem;
+  --text-lg:       1.5625rem;
+  --text-xl:       1.953rem;
+  --text-2xl:      2.441rem;
+  --text-3xl:      3.052rem;
+  --text-display:  clamp(2.75rem, 5.5vw + 0.5rem, 5rem);   /* hero display */
+  --text-section:  clamp(1.5rem, 2.5vw + 0.5rem, 2.25rem); /* section heads */
+
+  /* ── RADIUS ─────────────────────────────────────────────────────── */
+
+  --radius-sm:     0.25rem;
+  --radius-md:     0.5rem;
+  --radius-lg:     0.75rem;
+  --radius-xl:     1rem;
+  --radius-pill:   9999px;
+
+  /* ── MOTION ─────────────────────────────────────────────────────── */
+
+  /* Motion-cut project — no framer-motion installed */
+  /* Preserved for downstream adoption */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:       cubic-bezier(0.5, 0, 1, 0.5);
+  --ease-in-out:   cubic-bezier(0.5, 0, 0.25, 1);
+  --dur-fast:      120ms;
+  --dur-base:      200ms;
+  --dur-slow:      300ms;
+
+  /* ── RULES ──────────────────────────────────────────────────────── */
+
+  --rule-hairline: 1px solid var(--color-rule);
+}
