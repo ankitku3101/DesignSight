@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import { analyzeImageWithGoogleVision } from '../services/googleVision';
-import { getHybridUIUXSuggestions } from '../services/gemini'; // <-- import Gemini service
+import { getHybridUIUXSuggestions } from '../services/gemini';
 
 dotenv.config();
 

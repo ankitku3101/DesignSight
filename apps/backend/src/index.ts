@@ -14,9 +14,9 @@ const PORT = process.env.PORT || 5000;
 console.log('Google credentials path:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
 // Middleware
-app.use(cors()); // 👈 enable CORS for all origins
+app.use(cors());
 app.use(express.json());
-app.use(express.text()); // 👈 also allow text payloads if needed
+app.use(express.text());
 
 // Serve uploaded images
 const UPLOAD_DIR = path.join(__dirname, './uploads');
