@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { objectIdSchema } from '../validation/objectId';
-import { uploadScreenSchema } from '../validation/screen.schema';
+import { roleQuerySchema, uploadScreenSchema } from '../validation/screen.schema';
 import { AppError } from '../middleware/errorHandler.middleware';
 import * as screenService from '../services/screen.service';
 
@@ -24,7 +24,16 @@ export async function listRecentScreens(_req: Request, res: Response) {
 
 export async function getScreen(req: Request, res: Response) {
   const screenId = objectIdSchema.parse(req.params.screenId);
+  const { role } = roleQuerySchema.parse(req.query);
   const screen = await screenService.getScreenById(screenId);
-  const feedback = await screenService.listFeedbackForScreen(screenId);
+  const feedback = await screenService.listFeedbackForScreen(screenId, role);
   res.json({ screen, feedback });
+}
+
+export async function exportScreen(req: Request, res: Response) {
+  const screenId = objectIdSchema.parse(req.params.screenId);
+  const { role } = roleQuerySchema.parse(req.query);
+  const data = await screenService.buildScreenExport(screenId, role);
+  res.setHeader('Content-Disposition', `attachment; filename="screen-${screenId}-feedback.json"`);
+  res.json(data);
 }

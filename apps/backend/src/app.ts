@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { env } from './config/env';
 import screenRoutes from './routes/screen.routes';
+import commentRoutes from './routes/comment.routes';
 import { errorHandler } from './middleware/errorHandler.middleware';
 
 export function createApp() {
@@ -15,6 +16,7 @@ export function createApp() {
   });
 
   app.use('/api', screenRoutes);
+  app.use('/api', commentRoutes);
 
   app.use(errorHandler);
 

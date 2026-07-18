@@ -4,6 +4,7 @@ import { findOrCreateProject } from './project.service';
 import { uploadScreenImage } from './storage/cloudinary.service';
 import { analyzeScreen } from './ai/analyzeScreen';
 import { AppError } from '../middleware/errorHandler.middleware';
+import { filterFeedbackForRole, type Role } from 'designsight-shared';
 
 export async function uploadScreen(projectName: string | undefined, file: Express.Multer.File) {
   const project = await findOrCreateProject(projectName);
@@ -70,6 +71,32 @@ export async function getScreenById(screenId: string) {
   return screen;
 }
 
-export async function listFeedbackForScreen(screenId: string) {
-  return Feedback.find({ screenId }).sort({ createdAt: 1 });
+export async function listFeedbackForScreen(screenId: string, role?: Role) {
+  const feedback = await Feedback.find({ screenId }).sort({ createdAt: 1 });
+  return role ? filterFeedbackForRole(feedback, role) : feedback;
+}
+
+// Role scoping here is a view-scoping convenience shared with the screen-detail
+// endpoint, applied the same way whether feedback is being read or exported.
+export async function buildScreenExport(screenId: string, role?: Role) {
+  const screen = await getScreenById(screenId);
+  const feedback = await listFeedbackForScreen(screenId, role);
+
+  return {
+    screen: {
+      id: screen._id,
+      imageUrl: screen.imageUrl,
+      status: screen.status,
+      uploadedAt: screen.uploadedAt,
+    },
+    feedback: feedback.map((item) => ({
+      id: item._id,
+      category: item.category,
+      severity: item.severity,
+      message: item.message,
+      coordinates: item.coordinates,
+    })),
+    role: role ?? null,
+    exportedAt: new Date().toISOString(),
+  };
 }

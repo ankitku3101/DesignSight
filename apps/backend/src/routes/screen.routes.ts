@@ -10,5 +10,6 @@ router.post('/screens', upload.single('image'), screenController.uploadScreen);
 router.post('/screens/:screenId/analyze', screenController.analyzeScreen);
 router.get('/screens', screenController.listRecentScreens);
 router.get('/screens/:screenId', screenController.getScreen);
+router.get('/screens/:screenId/export', screenController.exportScreen);
 
 export default router;
