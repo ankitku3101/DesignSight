@@ -1,4 +1,5 @@
-import type { FeedbackItemResponse, ProjectRef, ScreenSummary } from './types';
+import type { Role } from 'designsight-shared';
+import type { CommentNode, FeedbackItemResponse, ProjectRef, ScreenSummary } from './types';
 
 const API_URL = process.env.NEXT_PUBLIC_BE_URL || 'http://localhost:5000';
 
@@ -33,6 +34,23 @@ export function listRecentScreens(): Promise<ScreenSummary[]> {
 
 export function getScreen(
   screenId: string,
+  role?: Role,
 ): Promise<{ screen: ScreenSummary; feedback: FeedbackItemResponse[] }> {
-  return request(`/api/screens/${screenId}`);
+  const query = role ? `?role=${role}` : '';
+  return request(`/api/screens/${screenId}${query}`);
+}
+
+export function listComments(feedbackId: string): Promise<CommentNode[]> {
+  return request(`/api/feedback/${feedbackId}/comments`);
+}
+
+export function createComment(
+  feedbackId: string,
+  input: { message: string; authorName: string; authorRole: Role; parentCommentId?: string },
+): Promise<CommentNode> {
+  return request(`/api/feedback/${feedbackId}/comments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
 }

@@ -5,11 +5,15 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ExportButton } from '@/components/ExportButton';
 import { FeedbackList } from '@/components/FeedbackList';
+import { RoleSwitcher } from '@/components/RoleSwitcher';
+import { ScreenCanvas } from '@/components/ScreenCanvas';
 import { analyzeScreen, getScreen } from '@/lib/api';
+import { getStoredRole, setStoredRole } from '@/lib/localIdentity';
 import type { FeedbackItemResponse, ScreenSummary } from '@/lib/types';
+import type { Role } from 'designsight-shared';
 
 type PageProps = {
   params: Promise<{ screenId: string }>;
@@ -23,9 +27,11 @@ export default function ScreenDetailPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeFeedbackId, setActiveFeedbackId] = useState<string | null>(null);
+  const [role, setRole] = useState<Role>('designer');
 
-  function load() {
-    getScreen(screenId)
+  function load(currentRole: Role) {
+    getScreen(screenId, currentRole)
       .then((data) => {
         setScreen(data.screen);
         setFeedback(data.feedback);
@@ -35,17 +41,29 @@ export default function ScreenDetailPage({ params }: PageProps) {
   }
 
   useEffect(() => {
-    load();
+    const storedRole = getStoredRole();
+    setRole(storedRole);
+    load(storedRole);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screenId]);
+
+  function handleRoleChange(nextRole: Role) {
+    setRole(nextRole);
+    setStoredRole(nextRole);
+    setLoading(true);
+    load(nextRole);
+  }
 
   async function handleAnalyze() {
     setAnalyzing(true);
     try {
-      const { screen: updated, feedback: updatedFeedback } = await analyzeScreen(screenId);
+      const { screen: updated } = await analyzeScreen(screenId);
       setScreen(updated);
-      setFeedback(updatedFeedback);
-      if (updated.status === 'failed') toast.error(updated.error ?? 'Analysis failed');
+      if (updated.status === 'failed') {
+        toast.error(updated.error ?? 'Analysis failed');
+      } else {
+        load(role);
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Analysis failed');
     } finally {
@@ -70,27 +88,31 @@ export default function ScreenDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">
-            {projectName ?? 'Screen'}
-          </h1>
-          <p className="text-sm text-muted-foreground">Uploaded {new Date(screen.uploadedAt).toLocaleString()}</p>
+          <h1 className="text-xl font-semibold tracking-tight">{projectName ?? 'Screen'}</h1>
+          <p className="text-sm text-muted-foreground">
+            Uploaded {new Date(screen.uploadedAt).toLocaleString()}
+          </p>
         </div>
-        <Badge variant="outline" className="capitalize w-fit">
-          {screen.status}
-        </Badge>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge variant="outline" className="capitalize">
+            {screen.status}
+          </Badge>
+          <RoleSwitcher value={role} onChange={handleRoleChange} />
+          {screen.status === 'analyzed' && <ExportButton screenId={screen._id} role={role} />}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={screen.imageUrl}
-            alt="Uploaded screen"
-            className="w-full rounded-lg border border-border"
+        <div className="rounded-xl border border-border bg-card p-3">
+          <ScreenCanvas
+            imageUrl={screen.imageUrl}
+            feedback={feedback}
+            activeFeedbackId={activeFeedbackId}
+            onActivate={setActiveFeedbackId}
           />
-        </Card>
+        </div>
 
         <div className="space-y-4">
           {screen.status === 'uploaded' && (
@@ -120,7 +142,14 @@ export default function ScreenDetailPage({ params }: PageProps) {
             </div>
           )}
 
-          {screen.status === 'analyzed' && <FeedbackList items={feedback} />}
+          {screen.status === 'analyzed' && (
+            <FeedbackList
+              items={feedback}
+              activeFeedbackId={activeFeedbackId}
+              onSelect={setActiveFeedbackId}
+              role={role}
+            />
+          )}
         </div>
       </div>
     </div>

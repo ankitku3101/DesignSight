@@ -1,4 +1,4 @@
-import type { FeedbackCategory, FeedbackSeverity, NormalizedCoordinates } from 'designsight-shared';
+import type { FeedbackCategory, FeedbackSeverity, NormalizedCoordinates, Role } from 'designsight-shared';
 
 export type ScreenStatus = 'uploaded' | 'processing' | 'analyzed' | 'failed';
 
@@ -28,4 +28,17 @@ export interface FeedbackItemResponse {
   message: string;
   coordinates: NormalizedCoordinates | null;
   createdAt: string;
+}
+
+export interface CommentNode {
+  _id: string;
+  feedbackId: string;
+  parentCommentId: string | null;
+  authorName: string;
+  authorRole: Role;
+  message: string;
+  createdAt: string;
+  editedAt: string | null;
+  deletedAt: string | null;
+  children: CommentNode[];
 }
