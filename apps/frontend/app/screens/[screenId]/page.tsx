@@ -10,6 +10,7 @@ import { ExportButton } from '@/components/ExportButton';
 import { FeedbackList } from '@/components/FeedbackList';
 import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { ScreenCanvas } from '@/components/ScreenCanvas';
+import { ShareButton } from '@/components/ShareButton';
 import { analyzeScreen, getScreen } from '@/lib/api';
 import { getStoredRole, setStoredRole } from '@/lib/localIdentity';
 import type { FeedbackItemResponse, ScreenSummary } from '@/lib/types';
@@ -100,57 +101,56 @@ export default function ScreenDetailPage({ params }: PageProps) {
             {screen.status}
           </Badge>
           <RoleSwitcher value={role} onChange={handleRoleChange} />
+          <ShareButton screenId={screen._id} />
           {screen.status === 'analyzed' && <ExportButton screenId={screen._id} role={role} />}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="rounded-xl border border-border bg-card p-3">
-          <ScreenCanvas
-            imageUrl={screen.imageUrl}
-            feedback={feedback}
+      <div className="rounded-xl border border-border bg-card p-3">
+        <ScreenCanvas
+          imageUrl={screen.imageUrl}
+          feedback={feedback}
+          activeFeedbackId={activeFeedbackId}
+          onActivate={setActiveFeedbackId}
+        />
+      </div>
+
+      <div className="space-y-4">
+        {screen.status === 'uploaded' && (
+          <div className="rounded-lg border border-dashed border-border p-6 text-center space-y-3">
+            <p className="text-sm text-muted-foreground">Not analyzed yet.</p>
+            <Button onClick={handleAnalyze} disabled={analyzing}>
+              {analyzing && <Loader2 className="size-4 animate-spin" />}
+              Analyze
+            </Button>
+          </div>
+        )}
+
+        {screen.status === 'processing' && (
+          <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin mx-auto mb-2" />
+            Analyzing…
+          </div>
+        )}
+
+        {screen.status === 'failed' && (
+          <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-3">
+            <p className="text-sm text-destructive">{screen.error}</p>
+            <Button onClick={handleAnalyze} disabled={analyzing} variant="secondary">
+              {analyzing && <Loader2 className="size-4 animate-spin" />}
+              Retry analysis
+            </Button>
+          </div>
+        )}
+
+        {screen.status === 'analyzed' && (
+          <FeedbackList
+            items={feedback}
             activeFeedbackId={activeFeedbackId}
-            onActivate={setActiveFeedbackId}
+            onSelect={setActiveFeedbackId}
+            role={role}
           />
-        </div>
-
-        <div className="space-y-4">
-          {screen.status === 'uploaded' && (
-            <div className="rounded-lg border border-dashed border-border p-6 text-center space-y-3">
-              <p className="text-sm text-muted-foreground">Not analyzed yet.</p>
-              <Button onClick={handleAnalyze} disabled={analyzing}>
-                {analyzing && <Loader2 className="size-4 animate-spin" />}
-                Analyze
-              </Button>
-            </div>
-          )}
-
-          {screen.status === 'processing' && (
-            <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin mx-auto mb-2" />
-              Analyzing…
-            </div>
-          )}
-
-          {screen.status === 'failed' && (
-            <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-3">
-              <p className="text-sm text-destructive">{screen.error}</p>
-              <Button onClick={handleAnalyze} disabled={analyzing} variant="secondary">
-                {analyzing && <Loader2 className="size-4 animate-spin" />}
-                Retry analysis
-              </Button>
-            </div>
-          )}
-
-          {screen.status === 'analyzed' && (
-            <FeedbackList
-              items={feedback}
-              activeFeedbackId={activeFeedbackId}
-              onSelect={setActiveFeedbackId}
-              role={role}
-            />
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

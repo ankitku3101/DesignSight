@@ -74,7 +74,7 @@ function CommentNodeView({
             <button
               type="button"
               onClick={() => setReplying((v) => !v)}
-              className="text-xs text-muted-foreground hover:text-foreground mt-1"
+              className="text-xs text-muted-foreground hover:text-foreground mt-1 cursor-pointer"
             >
               Reply
             </button>
@@ -108,7 +108,13 @@ function CommentNodeView({
 
 export function CommentThread({ feedbackId, role }: { feedbackId: string; role: Role }) {
   const [comments, setComments] = useState<CommentNode[] | null>(null);
+  // Collapsed by default — an expanding thread was the main reason cards in the
+  // grid ended up wildly different heights, so nothing but the toggle shows until clicked.
+  const [expanded, setExpanded] = useState(false);
   const [name, setName] = useState('');
+  // Whether a name was already on file when this thread loaded — independent of
+  // `name` itself, so typing into the name field doesn't hide the field mid-keystroke.
+  const [hasStoredName, setHasStoredName] = useState(false);
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -120,7 +126,9 @@ export function CommentThread({ feedbackId, role }: { feedbackId: string; role: 
 
   useEffect(() => {
     load();
-    setName(getStoredName());
+    const stored = getStoredName();
+    setName(stored);
+    setHasStoredName(Boolean(stored));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedbackId]);
 
@@ -133,6 +141,7 @@ export function CommentThread({ feedbackId, role }: { feedbackId: string; role: 
     setSubmitting(true);
     try {
       setStoredName(name.trim());
+      setHasStoredName(true);
       await createComment(feedbackId, {
         message: message.trim(),
         authorName: name.trim(),
@@ -148,38 +157,46 @@ export function CommentThread({ feedbackId, role }: { feedbackId: string; role: 
   }
 
   return (
-    <div className="space-y-3 pt-3 border-t border-border">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+    <div className="pt-3 border-t border-border">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+      >
         <MessageSquare className="size-3.5" />
         {comments?.length ?? 0} comment{comments?.length === 1 ? '' : 's'}
-      </div>
+      </button>
 
-      {comments?.map((node) => (
-        <CommentNodeView key={node._id} node={node} feedbackId={feedbackId} role={role} onPosted={load} />
-      ))}
+      {expanded && (
+        <div className="space-y-3 mt-3">
+          {comments?.map((node) => (
+            <CommentNodeView key={node._id} node={node} feedbackId={feedbackId} role={role} onPosted={load} />
+          ))}
 
-      <div className="space-y-2">
-        {!name && (
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your name"
-            className="h-8 text-sm"
-          />
-        )}
-        <div className="flex gap-2">
-          <Input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder={`Comment as ${roleLabel(role)}…`}
-            className="h-8 text-sm"
-          />
-          <Button size="sm" onClick={submitTopLevel} disabled={submitting}>
-            {submitting && <Loader2 className="size-3.5 animate-spin" />}
-            Post
-          </Button>
+          <div className="space-y-2">
+            {!hasStoredName && (
+              <Input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+                className="h-8 text-sm"
+              />
+            )}
+            <div className="flex gap-2">
+              <Input
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder={`Comment as ${roleLabel(role)}…`}
+                className="h-8 text-sm"
+              />
+              <Button size="sm" onClick={submitTopLevel} disabled={submitting}>
+                {submitting && <Loader2 className="size-3.5 animate-spin" />}
+                Post
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

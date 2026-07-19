@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Bricolage_Grotesque, Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -55,10 +56,10 @@ export default function RootLayout({
       <body className="antialiased bg-background text-foreground font-sans">
         <Providers>
           <TooltipProvider>
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col page-glow">
 
               {/* N9 · Minimal two-end · wordmark left · [toggle + CTA] right */}
-              <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md backdrop-saturate-150 transition-[border-color,background-color] duration-200">
+              <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md backdrop-saturate-150 transition-[border-color,background-color] duration-200 relative">
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
 
                   {/* Left: brand */}
@@ -67,9 +68,13 @@ export default function RootLayout({
                     className="flex items-center gap-2.5 shrink-0 group"
                     aria-label="DesignSight home"
                   >
-                    <span
-                      className="h-[18px] w-[18px] rounded-[3px] bg-indigo flex-shrink-0 transition-opacity duration-150 group-hover:opacity-75"
-                      aria-hidden="true"
+                    <Image
+                      src="/logo.png"
+                      alt=""
+                      width={18}
+                      height={18}
+                      className="rounded-[3px] flex-shrink-0 transition-opacity duration-150 group-hover:opacity-75"
+                      priority
                     />
                     <span className="font-mono text-[0.8rem] font-medium tracking-tight text-foreground transition-colors duration-150 group-hover:text-indigo-text">
                       DesignSight
@@ -81,7 +86,7 @@ export default function RootLayout({
                     <ThemeToggle />
                     <Link
                       href="#upload"
-                      className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-md bg-foreground text-background text-sm font-medium hover:opacity-85 transition-opacity duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+                      className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-md bg-foreground text-background text-sm font-medium hover:opacity-85 transition-opacity duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
                     >
                       Upload a screen
                     </Link>
@@ -91,14 +96,14 @@ export default function RootLayout({
               </header>
 
               {/* Main content */}
-              <main className="flex-1">
+              <main className="flex-1 relative z-10">
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 lg:py-16">
                   {children}
                 </div>
               </main>
 
               {/* Ft5 · Statement footer · editorial closing line + meta */}
-              <footer className="border-t border-border/60 mt-auto">
+              <footer className="border-t border-border/60 mt-auto relative z-10">
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 py-10 lg:py-14 space-y-6">
                   <p className="text-section text-foreground max-w-[24ch]">
                     Your best design is the next one.

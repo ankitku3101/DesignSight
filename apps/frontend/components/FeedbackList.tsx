@@ -29,7 +29,10 @@ export function FeedbackList({ items, activeFeedbackId, onSelect, role }: Feedba
   }
 
   return (
-    <div className="space-y-3">
+    // A masonry-style column layout, not a row grid — cards naturally vary in
+    // height with content length, and forcing them to match by truncating text
+    // hides real feedback. Columns let uneven heights look intentional instead.
+    <div className="columns-1 sm:columns-2 xl:columns-3 gap-4">
       {items.map((item) => (
         <Card
           key={item._id}
@@ -37,7 +40,10 @@ export function FeedbackList({ items, activeFeedbackId, onSelect, role }: Feedba
             if (el) cardRefs.current.set(item._id, el);
             else cardRefs.current.delete(item._id);
           }}
-          className={cn('transition-shadow', item._id === activeFeedbackId && 'ring-2 ring-ring')}
+          className={cn(
+            'mb-4 break-inside-avoid transition-shadow',
+            item._id === activeFeedbackId && 'ring-2 ring-ring',
+          )}
         >
           <CardContent className="space-y-2">
             <div

@@ -162,6 +162,47 @@
   }
 }
 
+/* ── Ambient background glow — subtle radial blobs behind content ──────── */
+.page-glow {
+  position: relative;
+}
+.page-glow::before,
+.page-glow::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Top-right indigo bloom */
+.page-glow::before {
+  width: 45vw;
+  height: 45vw;
+  max-width: 720px;
+  max-height: 720px;
+  top: -8%;
+  right: -10%;
+  background: radial-gradient(circle, oklch(50% 0.22 265 / 8%) 0%, transparent 70%);
+  filter: blur(80px);
+}
+/* Bottom-left secondary bloom */
+.page-glow::after {
+  width: 50vw;
+  height: 50vw;
+  max-width: 800px;
+  max-height: 800px;
+  bottom: 10%;
+  left: -12%;
+  background: radial-gradient(circle, oklch(60% 0.118 185 / 6%) 0%, transparent 70%);
+  filter: blur(100px);
+}
+.dark .page-glow::before {
+  background: radial-gradient(circle, oklch(50% 0.22 265 / 12%) 0%, transparent 70%);
+}
+.dark .page-glow::after {
+  background: radial-gradient(circle, oklch(60% 0.118 185 / 8%) 0%, transparent 70%);
+}
+
 @layer utilities {
   /* Hero display — Bricolage Grotesque 700, tight tracking */
   .text-display {
