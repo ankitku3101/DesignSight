@@ -19,13 +19,10 @@ Classify every issue into exactly one of:
 - Use null for the box ONLY when the issue is genuinely screen-wide (e.g. "no consistent spacing system"). If the issue points at any identifiable element, it must have a box.
 
 ## Output
-Return 4–10 items as a JSON array, ordered by severity (most important first). Each item:
+Return 4–10 feedback items, ordered by severity (most important first). Each item:
 {
   "category": "accessibility" | "visual-hierarchy" | "content" | "ui-ux",
   "severity": "high" | "medium" | "low",
-  "title": string,        // short label, max ~8 words
-  "feedback": string,     // the problem, why it matters, and the fix
-  "box": { "x": number, "y": number, "w": number, "h": number } | null
-}
-
-Return ONLY the JSON array — no preamble, no markdown fences.`;
+  "message": string,      // the problem, why it matters, and the fix — 1-3 sentences
+  "coordinates": { "x": number, "y": number, "w": number, "h": number } | null
+}`;

@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import { MulterError } from 'multer';
 import { ZodError } from 'zod';
 
 /** Thrown by services/controllers for expected, user-facing failures (404, 409, 400, ...). */
@@ -19,6 +20,9 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
   }
   if (err instanceof ZodError) {
     return res.status(400).json({ message: 'Validation failed', issues: err.issues });
+  }
+  if (err instanceof MulterError) {
+    return res.status(400).json({ message: err.message });
   }
   console.error(err);
   res.status(500).json({ message: 'Internal server error' });

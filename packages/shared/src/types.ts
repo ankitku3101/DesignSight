@@ -19,13 +19,3 @@ export interface NormalizedCoordinates {
   w: number;
   h: number;
 }
-
-export interface FeedbackItem {
-  id: string;
-  screenId: string;
-  category: FeedbackCategory;
-  severity: FeedbackSeverity;
-  message: string;
-  coordinates: NormalizedCoordinates | null;
-  createdAt: string;
-}

@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createComment, listComments } from '@/lib/api';
-import { getStoredName, setStoredName } from '@/lib/localIdentity';
+import { useCommentIdentity } from '@/lib/useCommentIdentity';
 import type { CommentNode } from '@/lib/types';
 import type { Role } from 'designsight-shared';
 
@@ -34,15 +34,20 @@ function CommentNodeView({
   const [replying, setReplying] = useState(false);
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const { name, setName, hasStoredName, confirmName } = useCommentIdentity();
 
   async function submitReply() {
     if (!message.trim()) return;
+    const authorName = confirmName();
+    if (!authorName) {
+      toast.error('Enter your name to comment');
+      return;
+    }
     setSubmitting(true);
     try {
-      const name = getStoredName() || 'Anonymous';
       await createComment(feedbackId, {
         message: message.trim(),
-        authorName: name,
+        authorName,
         authorRole: role,
         parentCommentId: node._id,
       });
@@ -80,17 +85,27 @@ function CommentNodeView({
             </button>
           )}
           {replying && (
-            <div className="flex gap-2 mt-2">
-              <Input
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Write a reply…"
-                className="h-8 text-sm"
-              />
-              <Button size="sm" onClick={submitReply} disabled={submitting}>
-                {submitting && <Loader2 className="size-3.5 animate-spin" />}
-                Reply
-              </Button>
+            <div className="space-y-2 mt-2">
+              {!hasStoredName && (
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name"
+                  className="h-8 text-sm"
+                />
+              )}
+              <div className="flex gap-2">
+                <Input
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Write a reply…"
+                  className="h-8 text-sm"
+                />
+                <Button size="sm" onClick={submitReply} disabled={submitting}>
+                  {submitting && <Loader2 className="size-3.5 animate-spin" />}
+                  Reply
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -111,12 +126,9 @@ export function CommentThread({ feedbackId, role }: { feedbackId: string; role: 
   // Collapsed by default — an expanding thread was the main reason cards in the
   // grid ended up wildly different heights, so nothing but the toggle shows until clicked.
   const [expanded, setExpanded] = useState(false);
-  const [name, setName] = useState('');
-  // Whether a name was already on file when this thread loaded — independent of
-  // `name` itself, so typing into the name field doesn't hide the field mid-keystroke.
-  const [hasStoredName, setHasStoredName] = useState(false);
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const { name, setName, hasStoredName, confirmName } = useCommentIdentity();
 
   function load() {
     listComments(feedbackId)
@@ -126,25 +138,21 @@ export function CommentThread({ feedbackId, role }: { feedbackId: string; role: 
 
   useEffect(() => {
     load();
-    const stored = getStoredName();
-    setName(stored);
-    setHasStoredName(Boolean(stored));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedbackId]);
 
   async function submitTopLevel() {
     if (!message.trim()) return;
-    if (!name.trim()) {
+    const authorName = confirmName();
+    if (!authorName) {
       toast.error('Enter your name to comment');
       return;
     }
     setSubmitting(true);
     try {
-      setStoredName(name.trim());
-      setHasStoredName(true);
       await createComment(feedbackId, {
         message: message.trim(),
-        authorName: name.trim(),
+        authorName,
         authorRole: role,
       });
       setMessage('');

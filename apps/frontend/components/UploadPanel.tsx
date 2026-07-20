@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { UploadCloud, ImageIcon, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -24,6 +24,13 @@ export function UploadPanel() {
   const [uploadedScreen, setUploadedScreen] = useState<ScreenSummary | null>(null);
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+
+  // Revokes the previous blob URL whenever it's replaced or the component unmounts —
+  // createObjectURL leaks memory otherwise, since each call pins the file's bytes.
+  useEffect(() => {
+    if (!previewUrl) return;
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
 
   function selectFile(selected: File | null) {
     if (!selected) return;

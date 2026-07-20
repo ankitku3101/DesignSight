@@ -1,5 +1,6 @@
 import { Screen } from '../models/Screen.model';
 import { Feedback, type FeedbackDocument } from '../models/Feedback.model';
+import { Comment } from '../models/Comment.model';
 import { findOrCreateProject } from './project.service';
 import { uploadScreenImage } from './storage/cloudinary.service';
 import { analyzeScreen } from './ai/analyzeScreen';
@@ -32,7 +33,11 @@ export async function analyzeScreenById(screenId: string) {
   await screen.save();
 
   // Re-analyzing (a retry after failure, or re-running an already-analyzed screen)
-  // replaces the feedback set rather than appending a second copy alongside it.
+  // replaces the feedback set rather than appending a second copy alongside it. Old
+  // feedback docs get fresh ids on re-insert, so their comments must go with them —
+  // otherwise they're left as orphaned rows nothing can ever read again.
+  const staleFeedback = await Feedback.find({ screenId: screen._id }, '_id');
+  await Comment.deleteMany({ feedbackId: { $in: staleFeedback.map((f) => f._id) } });
   await Feedback.deleteMany({ screenId: screen._id });
 
   try {
